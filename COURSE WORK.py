@@ -10,12 +10,10 @@
 import time 
 start = time.time() 
 
-# validation checking - so the code doesnt crash if file name is changed 
-# find the file (Hotdogs.txt) and make a chest to put our end results (final_data).
-final_data = []
+# Final_Data is the storage for the filtered data
 with open('Hotdogs.txt', 'r') as file:
   for line in file:
-# this splits up the data everytime there is a comma becoming seperate items.
+# This splits up the data everytime there is a comma becoming seperate items.
     items = line.strip().split(',')
 
     final_data.append(items)
@@ -64,7 +62,7 @@ for i in (final_data):
                          
   print(f"Successfully loaded {len(final_data)} records.")
   return final_data
-# This closes the the actual hotdog.txt file and prints a message with organised profiles.
+# The code closes by itself when everything is done
 # TIMER 
 end = time.time()
 length = end - start
