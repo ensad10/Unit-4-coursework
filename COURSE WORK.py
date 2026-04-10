@@ -21,12 +21,12 @@ with open('hotdogs.txt', 'r') as file:
 
     record = {
         "V_ID": items[0],
-        "V_Name: items": items[1],
+        "V_Name": items[1],
         "Year_and_week": items[2],
         "Veg_dogs_sold": items[3],
         "Meat_dogs_sold": items[4],
         "Onions": items[5],
-        "Kechtup_L": items[6],
+        "Ketchup_L": items[6],
     }
     record_list.append(record)
 
@@ -36,17 +36,17 @@ for i in record_list:
   v_id = i["V_ID"]
 
 # Validation 1 
-  if len(v_id) != 6 or not v_id[:2].is alpha() or not v_id[:2].isupper() or v_id[2] != '_' or not v_id[3:].isdigit():
+  if len(v_id) != 6 or not v_id[:2].isalpha() or not v_id[:2].isupper() or v_id[2] != '_' or not v_id[3:].isdigit():
     print(f"ERROR! Vendor ID '{v_id}' must be at least 2 uppercases, an underscore and three digits!")
     is_valid = False 
 
 # Validation 2 
-  if len(i["V_Name"]) < 2 or len(i["V_name"]) > 25:
-    print(f"ERROR! Vendor {v_id}: Name is too short or long.")
-    is_valid = False
+    if len(i["V_Name"]) < 2 or len(i["V_name"]) > 25:
+      print(f"ERROR! Vendor {v_id}: Name is too short or long.")
+      is_valid = False
 
 # Validation 3
-  year_week = i["Year _and_week"]
+  year_week = i["Year_and_week"]
   if len(year_week) != 6 or not year_week.isdigit():
     print(f"ERROR! Vendor {v_id}: Year/Week must be int he format YYYYWW.")
     is_valid = False 
@@ -61,7 +61,7 @@ for i in record_list:
     print(f"ERROR! Vendor {v_id}: Veggie sales must end in a 0.")
     is_valid = False 
 # Validation 5
- if int(i["Meat_dogs_sold"]) % 10 != 0:
+  if int(i["Meat_dogs_sold"]) % 10 != 0:
     print(f"ERROR! Vendor {v_id}: Meat sales must end in a 0.")
     is_valid = False 
 
@@ -82,8 +82,3 @@ for i in record_list:
 print(f"\nProcessing complete. {len(final_data)} valid records kept.")
 for valid_item in final_data:
   print(f"Kept: {valid_item['V_ID']} - {valid_item['Year_and_week']}")
-
-
-
-
-    
