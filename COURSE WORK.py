@@ -10,72 +10,25 @@
 import time 
 start = time.time() 
 
-# Final_Data is the storage for the filtered data
-with open('Hotdogs.txt', 'r') as file:
+final_data = [] 
+record_list = []
+
+# section 1: LOADING 
+with open('hotdogs.txt', 'r') as file:
   for line in file:
-# This splits up the data everytime there is a comma becoming seperate items.
     items = line.strip().split(',')
+    if len(items) < 7: continue # This skips any empty lines which are irrelivant
 
-    final_data.append(items)
-# Validation starts here.
-for i in (final_data):
-  
-# Validation 1: 
-      /too do next:
-  
-# Validation 2: DONE!
-  if len(i[1]) < 2 or len(i[1]) > 25:
-    print(f"Invalid! Your name is too short.")
+    record = {
+        "V_ID": items[0],
+        "V_Name: items": items[1],
+        "Year_and_week": items[2],
+        "Veg_dogs_sold": items[3],
+        "Meat_dogs_sold": items[4],
+        "Onions": items[5],
+        "Kechtup_L": items[6],
 
-# Validation 3: Year and week 
-      /too do next:
 
-# validation 4/5: Hotdog sales, This checks if both veg and meat hotdogs sold are divisable by 10.
-        if int(i[3]) % 10 != 0:
-          print(f"Invalid! Hotdog sales have to end in a 0.")
-          
-        if int(i[4]) % 10 != 0:
-          print(f"Invalid! Hotdog sales have to end in a 0.")
-         
-          
-# Validation 6: Onion 
-        if float(i[5]) <= 0
 
-# validation 7: Ketchup, This checks if Ketchup must be between 1 and 4 Litres.
-        if int(i[6]) <1 or int(i[6]) > 4:
-          print(f"Invalid! Ketchup must be between 1 and 4 litres.")
-         
-        
-        record = {
-          "V_ID":(i[0]),
-          "V_Name":(i[1]) ,
-          "Year_and_week":(i[2]) ,
-          "Veg_dogs_sold":(i[3]),
-          "Meat_dogs_sold":(i[4]),
-          "Onions":(i[5]),
-          "Ketchup_L":(i[6]) ,
-        }
-        final_data.append(record)
-# (record) is basically the workers profiles. 
-# which is stored in the (final_data) a storage container.
-        final_data.append(record)
-                         
-  print(f"Successfully loaded {len(final_data)} records.")
-  return final_data
-# The code closes by itself when everything is done
-# TIMER 
-end = time.time()
-length = end - start
-print("it took ", length, " seconds") 
 
-# linear search - this checks the items one by one in order until the item is matched.
-def linear_check (data, target_name):
-  for vendor in data:
-    if vendor["name"] == target_name:
-      return vendor
-  return None 
-
-# Binary search - checks the data by halving the (data set) until the item is matched 
-# The data set MUST be sorted first
-def binary_search (data, target_name):
-  
+    
