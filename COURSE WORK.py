@@ -88,11 +88,13 @@ def validate_data(records):
         if (onions * 2) % 1 != 0:
             print(f"Invalid! Vendor {record['V_ID']} onions must be in half kilogram increments.")
             is_valid = False
+            
 # * RNAGE CHECKER - KETCHUP *
 # This validation stops the inputs at a reasonable range for e.g (1-4L). 
         if int(record["Ketchup_L"]) < 1 or int(record["Ketchup_L"]) > 4:
             print(f"Invalid! Vendor {record['V_ID']} ketchup must be between 1 and 4 litres.")
             is_valid = False
+            
 # * FINAL FILTERING *
 # This makes sure that any record that remains True after the (is_valid) boolean is added to the valid_reord bank.
         if is_valid:
