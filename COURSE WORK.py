@@ -15,6 +15,7 @@ def load_data(filename):
 # I made 2 empty lists in order to store the processed records and final_data after splitting the data into sections with (',')
     
 # --- Section 1: LOADING 
+    
 # I open the file in read mode using a 'with' block to make sure the file is also closed 
 # automatically after its processed, this stop memory from leaking.
     with open(filename, 'r') as file: 
@@ -39,7 +40,9 @@ def load_data(filename):
 # This adds the completed dictionary to the main data list in this case (final_data)
                 final_data.append(record)
     return final_data
+    
 # --- Section 2: VALIDATING Begins here. 
+
 def validate_data(records):
 # This is a list too ONLY hold the data that passes the validation checks 
     valid_records = []
@@ -102,4 +105,43 @@ def validate_data(records):
 # this line of code outputs a summary of how many valid records pass the cleaning proccess. 
     print(f"\nThere are {len(valid_records)} valid records\nOut of {len(records)} in total.")
     return valid_records
+
+# --- Section 2: SORTING Begins here.
+def bubble_sort(records, key):
+    data = reocrds.copy()
+    n = len(data)
+
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if data[j][key] > data[j + 1][key]:
+                data[j], data[j + 1] = data[j + 1], data[j]
+    return data
+    
+def quick_sort(records, key):
+    if len(records) <= 1:
+        return records
+
+    pivot = records[0]
+    left = []
+    right = []
+
+    for item in records[1:]:
+        if item[key] <= pivot[key]:
+            left.append(item)
+        else:
+            right.append(item)
+
+    return quick_sort(left, key) + [pivot] + quick_sort(right, key)
+
+def linear_search(records, key, target):
+    for record in records:
+        if record[key].lower() == target.lower():
+            return record
+    return None
+
+def linear_search_sorted(records, key, target):
+    for record in records:
+        if record[key].lower() == target.lower():
+            return record
+    return None
 
