@@ -107,13 +107,14 @@ def validate_data(records):
     return valid_records
 
 # --- Section 2: SORTING Begins here.
+
 def bubble_sort(records, key):
     data = reocrds.copy()
     n = len(data)
 
     for i in range(n):
         for j in range(0, n - i - 1):
-            if data[j][key] > data[j + 1][key]:
+            if data[j][key].lower() > data[j + 1][key].lower():
                 data[j], data[j + 1] = data[j + 1], data[j]
     return data
     
@@ -126,7 +127,7 @@ def quick_sort(records, key):
     right = []
 
     for item in records[1:]:
-        if item[key] <= pivot[key]:
+        if item[key].lower() <= pivot[key].lower():
             left.append(item)
         else:
             right.append(item)
@@ -145,3 +146,49 @@ def linear_search_sorted(records, key, target):
             return record
     return None
 
+def binary_search(records, key, target):
+    low = 0
+    high = len(records) - 1
+
+    target = target.lower()
+
+    while low <= high:
+        mid = (low + high) // 2
+        mid_val = records[mid][key].lower()
+
+        if mid_val == target:
+            return records[mid]
+        elif mid_val < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+
+    return None
+# --- Section 4: COMPARING Begins here.
+def compare_search_times(records, key, target):
+    start = time.time()
+    linear_search(records, key, target)
+    linear_time = time.time() - start
+
+    sorted_records = bubble_sort(records, key)
+
+    start = time.time()
+    binary_search(sorted_records, key, target)
+    binary_time = time.time() - start
+
+    print("\n~~ Comparison Search Time Comparison ~~")
+    print(f"Time taken Linear Search: {linear_time:.6f} seconds")
+    print(f"Time taken Binary Search: {binary_time:.6f} seconds")
+
+def compare_sort_times(records, key):
+    start = time.time()
+    bubble_sort(records, key)
+    bubble_time = time.time() - start 
+
+    start = time.time()
+    quick_sort(records, key)
+    quick_time = time.time() - start
+
+    print("\n~~ Comparing Sort Times ~~")
+    print(f"Time taken to Bubble Sort: {bubble_time:.6f} seconds")
+    print(f"Time taken Quick Sort: {quick_time:.6f} seconds")
