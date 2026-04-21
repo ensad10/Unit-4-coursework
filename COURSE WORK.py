@@ -58,4 +58,32 @@ def validate_data(records):
     print("~ After the validation check only", len(valid_records), "out of", len(records), "records have passed sucessfully ~\n")
     return valid_records
 
+#~~~~~
+# Loading DATA
+#~~~~~
+records = load_data('Hotdogs.txt')
+records = validate_data(records)
+
+#~~~~~
+# MY MENU
+#~~~~~
+
+search_choice = int(input("What search Would you like to do? (1-3)\n1) Linear serach (sorted)\n2) Linear search (unsorted)\n3) Binary search\n\n"))
+while search_choice > 3 or search_choice < 1:
+    print("Invalid Value\n")
+    search_choice = int(input("What search Would you like to do? (1-3)\n1) Linear serach (sorted)\n2) Linear search (unsorted)\n3) Binary search\n\n"))
+if search_choice == 1:
+    options = int(input("What do you want to linear search  (0-6)\n0) VendorID\n1) Vendor Name\n2) Year and week\n3) Veg hotdogs sold\n4) Meat hotdogs sold\n5) Onions\n6) Ketchup used\n\n~ "))
+
+
+    while options > 6:
+        print("Invalid Value\n")
+        options = int(input("What do you want to linear search  (0-6)\n0) VendorID\n1) Vendor Name\n2) Year and week\n3) Veg hotdogs sold\n4) Meat hotdogs sold\n5) Onions\n6) Ketchup used\n\n~ "))
+    if options > 2:
+        higher_lower = int(input("Would you like to find the highest value or lowest value?\n\n(1) for highest\n(2) for lowest\n\n~ "))
+        while higher_lower > 2:
+            print("Invalid Value")
+            higher_lower = int(input("Would you like to find the highest value or lowest value?\n\n(1) for highest\n(2) for lowest\n\n~ "))
+
+
 
