@@ -2,7 +2,7 @@
 import time
 
 #------------------
-# LOAD MY DATA - changed from a dictionary to a list for efficency - 
+# LOAD MY DATA
 #------------------
 
 def load_data(filename):
@@ -18,6 +18,8 @@ def load_data(filename):
         print("Could not find or read the file!")
 
     return final_data
+records = load_data('Hotdogs.txt')
+    
 #~~~~~
 # VALIDATE DATA
 #~~~~~
@@ -58,32 +60,94 @@ def validate_data(records):
     print("~ After the validation check only", len(valid_records), "out of", len(records), "records have passed sucessfully ~\n")
     return valid_records
 
-#~~~~~
-# Loading DATA
-#~~~~~
-records = load_data('Hotdogs.txt')
-records = validate_data(records)
 
-#~~~~~
-# MY MENU
-#~~~~~
+valid_records = validate_data(records)
 
-search_choice = int(input("What search Would you like to do? (1-3)\n1) Linear serach (sorted)\n2) Linear search (unsorted)\n3) Binary search\n\n"))
-while search_choice > 3 or search_choice < 1:
-    print("Invalid Value\n")
-    search_choice = int(input("What search Would you like to do? (1-3)\n1) Linear serach (sorted)\n2) Linear search (unsorted)\n3) Binary search\n\n"))
-if search_choice == 1:
-    options = int(input("What do you want to linear search  (0-6)\n0) VendorID\n1) Vendor Name\n2) Year and week\n3) Veg hotdogs sold\n4) Meat hotdogs sold\n5) Onions\n6) Ketchup used\n\n~ "))
+def high_low(records, tracker, length_tracker, maximum, highOrlow):
+    if highOrlow == 1:
+        if len(tracker) and len(length_tracker) != 0:
+            print("Highest: ", tracker, " index: ", length_tracker)
+
+    elif highOrlow == 2:   
+        if len(tracker) and len(length_tracker) != 0:
+            print("Lowest: ", tracker, " index: ", length_tracker)
+
+    else:
+        print("Highest: ", maximum, " index: ", tracker_length)
+        print("Lowest: ", maximum, " index: ", tracker_length)
+    
+def linear_search(records, options, higher_lower):
+    highest = 0 # has too be zero so numbers can surpass it. 
+    lowest = 100000000000000000000000000 # has too be low so nothing surpasses it.
+    high_list = [] # Empty
+    low_list = [] # Empty 
+    index_list = [] # Empty
+    name_date = []
+
+    if options == 3 or options == 4 or options == 6:
+        index = 1 # index has to start at 1 (basically the first line)
+        if higher_lower == 1: # if the user input is 1 then the loop begins here
+            for record in records:
+                if int(record[options]) > highest: # if record (1-7 e.g Vendor ID, Vendor Name etc..) is bigger than highest continue through the loop.
+                    highest = int(record[options]) 
+
+            for i in records:
+                if int(i[options]) == highest: # if i is the highest value find the index and put it into the index.list 
+                    index_list.append(index) 
+                    high_list.append(int(i[options])) # this puts the highest value into the high.list
+                index += 1 # this adds 1 too the index counter so that it matches the row of the highest value within the record(option)
+            high_low(records, high_list, index_list, highest, higher_lower)
+
+        if higher_lower == 2: # if higher_lower = 2 then we are looking for the lowest number 
+            for record in records: 
+                if int(record[options]) < lowest: 
+                    lowest = int(record[options]) # checks in each record (line of data includes Vendor ID, V_name etc...) based on what the user inputs 
+
+            for i in records:
+                if int(i[options]) == lowest:
+                    index_list.append(index)
+                    low_list.append(int(i[options]))
+                index += 1
+            high_low(records, low_list, index_list, lowest, higher_lower)
 
 
-    while options > 6:
-        print("Invalid Value\n")
-        options = int(input("What do you want to linear search  (0-6)\n0) VendorID\n1) Vendor Name\n2) Year and week\n3) Veg hotdogs sold\n4) Meat hotdogs sold\n5) Onions\n6) Ketchup used\n\n~ "))
-    if options > 2:
-        higher_lower = int(input("Would you like to find the highest value or lowest value?\n\n(1) for highest\n(2) for lowest\n\n~ "))
-        while higher_lower > 2:
-            print("Invalid Value")
-            higher_lower = int(input("Would you like to find the highest value or lowest value?\n\n(1) for highest\n(2) for lowest\n\n~ "))
+    if options == 5:
+        index = 1
+        if higher_lower == 1:
+            for record in records:
+                if float(record[options]) > highest:
+                    highest = float(record[options])
 
+            for i in records:
+                if float(i[options]) == highest:
+                    index_list.append(index)
+                    high_list.append(float(i[options]))
+                index += 1
+            high_low(records, high_list, index_list, highest, higher_lower)
+
+
+        if higher_lower == 2:
+            for record in records:
+                if float(record[options]) < lowest:
+                    lowest = float(record[options])
+
+            for i in records:
+                if float(i[options]) == lowest:
+                    index_list.append(index)
+                    low_list.append(float(i[options]))
+                index += 1
+            high_low(records, low_list, index_list, lowest, higher_lower)
+
+
+    if options == 0 or options == 1 or options == 2:
+        search_choice = input("Enter what name or date you are looking for: ")
+        for record in records:
+            if search_choice.upper() == record[options].upper():
+                    name_date.append(record[options])
+            else:
+                continue
+                    
+        if len(name_date) == 0:
+            print("Name not found in records. ")
 
 
