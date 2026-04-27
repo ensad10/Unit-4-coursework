@@ -151,3 +151,62 @@ def linear_search(records, options, higher_lower):
             print("Name not found in records. ")
 
 
+#~~~~~
+# SORTING
+#~~~~~
+
+
+def bubble_sort(records, key):
+    data = records
+    n = len(data)
+    count = 0
+    
+    for i in range(n):
+        for j in range(0, n - i - 1):
+                if data[j][key] > data[j + 1][key]:
+                    data[j], data[j + 1] = data[j + 1], data[j]
+                    count += 1
+    return data
+
+
+def quick_sort(records, column):
+    
+    if len(records) <= 1:
+        return records
+    
+    
+    pivot = records[0]
+    left = []
+    right = []
+    
+    
+    for item in records[1:]:
+        
+        if item[column] <= pivot[column]:
+            left.append(item)
+        else:
+            right.append(item)
+            
+    
+    return quick_sort(left, column) + [pivot] + quick_sort(right, column)
+
+def binary_search(records, target, column):
+    low = 0
+    high = len(records) - 1
+    
+    while low <= high:
+        mid = (low + high) // 2
+       
+        mid_value = str(records[mid][column]).upper()
+        search_target = str(target).upper()
+        
+        if mid_value == search_target:
+            return records[mid]  
+        elif mid_value < search_target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return None 
+
+
+
