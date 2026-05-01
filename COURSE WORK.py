@@ -1,381 +1,343 @@
 import time
 
-#------------------
-# LOAD MY DATA 
-#------------------
-# this is where loading the file takes place. 
+# Helper list to keep track of what each index means
+# 0:ID, 1:Name, 2:Week, 3:Veg, 4:Meat, 5:Onions, 6:Ketchup
+header_list = ["ID", "Name", "Week", "Veg", "Meat", "Onions", "Ketchup"]
+
 def load_data(filename):
     final_data = []
-    
     try:
         with open(filename, 'r') as file:
             for line in file:
                 items = line.strip().split(',')
-                final_data.append(items)
-                    
+# Standard check to ensure row is complete
+                if len(items) == 7:
+                    final_data.append(items)
     except:
         print("Could not find or read the file!")
-
     return final_data
+# Fixed validation section using 'row' consistently
+def validation_check(records):
+    clean_data = []
+    for row in records:
+# Check Vendor ID (Uppercase, 2 letters, underscore, 3 digits)
+        if len(row[0]) != 6 or not row[0][:2].isupper() or not row[0][:2].isalpha() or row[0][2] != '_' or not row[0][3:].isdigit():
+            continue
+# Check Vendor name (between 2 and 25 characters)
+        if len(row[1]) < 2 or len(row[1]) > 25:
+            continue
+# Check Year and Week (YYYYWW format, week between 1 and 52)
+        if len(row[2]) != 6 or not row[2].isdigit() or int(row[2][4:]) < 1 or int(row[2][4:]) > 52:
+            continue            
+# Check if the veg dogs sold are divisible by 10
+        if int(row[3]) % 10 != 0:
+            continue            
+# Check if the meat dogs sold are divisible by 10
+        if int(row[4]) % 10 != 0:
+            continue            
+# Check if the onions are in Increments of 0.5
+        if (float(row[5]) * 2).is_integer() == False:
+            continue            
+# Check if the ketchup is an integer between 1 and 4
+        if int(row[6]) < 1 or int(row[6]) > 4:
+            continue
+            
+        clean_data.append(row)
 
-records = load_data('Hotdogs.txt')
+    print("~ After the validation check only", len(clean_data), "out of", len(records), "records have passed successfully ~")
+    return clean_data
     
-#~~~~~
-# VALIDATE DATA this is where the validation checks are held.
-#~~~~~
-
-def validate_data(records):
-    valid_records = []
-    # these lines of code check Vendor ID is uppercase, two letters, underscore, three digits e.g. AB_123
-    for record in records:
-        if len(record[0]) != 6 or not record[0][:2].isupper() or not record[0][:2].isalpha() or record[0][2] != '_' or not record[0][3:].isdigit():
-            continue
-        # these lines of code check Vendor name is between 2 and 25 characters
-        if len(record[1]) < 2 or len(record[1]) > 25:
-            continue
-        # these lines of code check if the Year and Week is in format YYYYWW and week is between 1 and 52
-        if len(record[2]) != 6 or not record[2].isdigit() or (int(record[2][3:]) >= 1 and int(record[2][3:]) <= 52): 
-            continue
-        # these lines of code check if the veg dogs sold are divisible by 10
-        if int(record[3]) % 10 != 0:
-            continue
-        # these lines of code check if the meat dogs sold are divisible by 10
-        if int(record[4]) % 10 != 0:
-            continue
-        # these lines of code check if the onions are in Increments of for e.g. 0.5, 1.0, 1.5
-        if (float(record[5]) * 2).is_integer() == False:
-            continue
-        # these lines of code check if the ketchup is an integer between 1 and 4
-        if int(record[6]) >= 1 and int(record[6]) <= 4:
-            valid_records.append(record)
-     # Because everything else has passed the checks this record is ready to be added to valid_records list
-    print("~ After the validation check only", len(valid_records), "out of", len(records), "records have passed sucessfully ~\n")
-    return valid_records
-
-valid_records = validate_data(records)
-
-
-#~~~~~
-# SEARCHING this is where the searching functions are held
+#~~~~~   
+# SEARCHING #
 #~~~~~
 
-def linear_search(records, options, higher_lower):
-    search_choice = get_search_value(records, options)
-    matches = []
+def linear_search_unsorted(data, target, col):
+    results_found = []
+    search_term = target.lower()
+    
+    for item in data:
+        current_value = item[col].lower()
+# Check every single row to find every match
+        if current_value == search_term:
+            results_found.append(item)
+            
+    return results_found
 
-    for record in records:
-        if search_choice.upper().strip() == record[options].upper().strip():
-            matches.append(record)
+def linear_search_sorted(data, target, col):
+    results_found = []
+    search_term = target.lower()
+    
+    for item in data:
+        current_value = item[col].lower()
+        
+        if current_value == search_term:
+            results_found.append(item)
+        elif current_value > search_term:
+# Stop searching because the data is sorted alphabetically/numerically
+# and we have passed where the target would be
+            break
+            
+    return results_found
 
-    if matches:
-        print("\nFound:", len(matches))
-        for row in matches:
-            print(row)
-    else:
-        print("Not found")
-
-
-def binary_search_all(records, target, column):
-    low = 0
-    high = len(records) - 1
-    results = []
-
-    target = str(target).upper()
-
-    while low <= high:
-        mid = (low + high) // 2
-        mid_value = str(records[mid][column]).upper()
-
-        if mid_value == target:
-
-            # found one match
-            results.append(records[mid])
-
-            # check left side
-            left = mid - 1
-            while left >= 0 and str(records[left][column]).upper() == target:
-                results.append(records[left])
-                left -= 1
-
-            # check right side
-            right = mid + 1
-            while right < len(records) and str(records[right][column]).upper() == target:
-                results.append(records[right])
-                right += 1
-
-            return results
-
-        elif mid_value < target:
-            low = mid + 1
+def binary_search(data, target, col):
+    low_index = 0
+    high_index = len(data) - 1
+    found_list = []
+    search_term = target.lower()
+    
+    while low_index <= high_index:
+        mid_index = (low_index + high_index) // 2
+        mid_val = data[mid_index][col].lower()
+        
+        if mid_val == search_term:
+# We found a match, now we must look around it for duplicates
+            found_list.append(data[mid_index])
+# Check the items to the left (backwards)
+            left_pointer = mid_index - 1
+            while left_pointer >= 0:
+                if data[left_pointer][col].lower() == search_term:
+                    found_list.append(data[left_pointer])
+                    left_pointer = left_pointer - 1
+                else:
+                    break
+# No more matches this way therefore we stop the code 
+# Check the items to the right (forwards)
+            right_pointer = mid_index + 1
+            while right_pointer < len(data):
+                if data[right_pointer][col].lower() == search_term:
+                    found_list.append(data[right_pointer])
+                    right_pointer = right_pointer + 1
+                else:
+                    break
+# No more matches this way therefore we stop the code 
+            return found_list 
+        elif mid_val < search_term:
+            low_index = mid_index + 1
         else:
-            high = mid - 1
-
-    return []
-
-#~~~~~
-# Get_search_value this is where the user gets to either enter a value they are looking for in the dadt storage or use the following value given in the list below to search for.
-#~~~~~
-
-def get_search_value(records, column):
-    values = sorted(set([r[column] for r in records]))
-
-    print("\nChoose a value or type your own:")
-    print("0) Type manually")
-
-    for i, v in enumerate(values[:5], 1):
-        print(f"{i}) {v}")
-
-    choice = input("\nEnter number or press Enter: ")
-
-    if choice == "":
-        return input("Enter value: ")
-
-    if choice.isdigit():
-        choice = int(choice)
-
-        if choice == 0:
-            return input("Enter value: ")
-
-        if 1 <= choice <= len(values[:5]):
-            return values[choice - 1]
-
-    print("Invalid choice, using manual input.")
-    return input("Enter value: ")
-
-#~~~~~
-# SORTING this is where the sorting functions are held.
-#~~~~~
-
-def bubble_sort(records, key):
-    data = records[:]
-    n = len(data)
+            high_index = mid_index - 1
+    return found_list
     
-    for i in range(n):
-        for j in range(0, n - i - 1):
-            if data[j][key] > data[j + 1][key]:
-                data[j], data[j + 1] = data[j + 1], data[j]
+#~~~~~
+# SORTING #
+#~~~~~
 
+def bubble_sort(data, col):
+# Standard bubble sort using nested loops and a temp variable
+    data_length = len(data)
+    for i in range(data_length):
+        for j in range(0, data_length - i - 1):
+            
+# Decide if we are comparing as numbers or text
+            if col >= 3:
+                val1 = float(data[j][col])
+                val2 = float(data[j+1][col])
+            else:
+                val1 = data[j][col].lower()
+                val2 = data[j+1][col].lower()
+            if val1 > val2:
+# Perform the actual swap
+                temporary_storage = data[j]
+                data[j] = data[j+1]
+                data[j+1] = temporary_storage
     return data
 
-
-def quick_sort(records, column):
-    if len(records) <= 1:
-        return records
+def quick_sort(data, col):
+# If the list is empty or has 1 item, it's already "sorted"
+    if len(data) <= 1:
+        return data
     
-    pivot = records[0]
-    left = []
-    right = []
+# Selecting the middle element as the pivot
+    middle_index = len(data) // 2
+    pivot_row = data[middle_index]
     
-    for item in records[1:]:
-        if item[column] <= pivot[column]:
-            left.append(item)
+    if col >= 3:
+        pivot_val = float(pivot_row[col])
+    else:
+        pivot_val = pivot_row[col].lower()
+        
+    left_side = []
+    middle_side = []
+    right_side = []
+    
+# Manually looping and sorting into the three temporary lists
+    for row in data:
+        if col >= 3:
+            current_compare = float(row[col])
         else:
-            right.append(item)
+            current_compare = row[col].lower()
             
-    return quick_sort(left, column) + [pivot] + quick_sort(right, column)
-
-
-#~~~~~
-# PERFORMANCE TEST this allows the user to choose when they want to see the comparison of the bubble sort/quick sort or the linear searches and binary search. 
-#~~~~~
-
-def performance_test(valid_records):
-    print("\n===== PERFORMANCE TEST =====")
-
-    col = 1
-    target = valid_records[0][col]  # automatic value (NO input)
-
-    data_bubble = valid_records[:]
-    data_quick = valid_records[:]
-
-    # SORTING
-    start = time.perf_counter()
-    bubble_sort(data_bubble, col)
-    bubble_time = time.perf_counter() - start
-
-    start = time.perf_counter()
-    sorted_quick = quick_sort(data_quick, col)
-    quick_time = time.perf_counter() - start
-
-    print("\n--- Sorting ---")
-    print("Bubble Sort:", bubble_time)
-    print("Quick Sort:", quick_time)
-
-    # SEARCHING
-    def linear_search_test(records, target, col):
-        for record in records:
-            if record[col] == target:
-                return record
-
-    start = time.perf_counter()
-    linear_search_test(valid_records, target, col)
-    lin_unsorted = time.perf_counter() - start
-
-    start = time.perf_counter()
-    linear_search_test(sorted_quick, target, col)
-    lin_sorted = time.perf_counter() - start
-
-    start = time.perf_counter()
-    binary_search_all(sorted_quick, target, col)
-    binary_time = time.perf_counter() - start
-
-    print("\n--- Searching ---")
-    print("Linear (unsorted):", lin_unsorted)
-    print("Linear (sorted):  ", lin_sorted)
-    print("Binary Search:    ", binary_time)
-
-    print("===============\n")
+        if current_compare < pivot_val:
+            left_side.append(row)
+        elif current_compare == pivot_val:
+            middle_side.append(row)
+        else:
+            right_side.append(row)
+    
+# Use recursion to sort the left and right, then join them
+    sorted_result = quick_sort(left_side, col) + middle_side + quick_sort(right_side, col)
+    return sorted_result
 
 #~~~~~
-# HIGH LOW this is where the user can choose if they want the highest/lowest value or both to be outputted when picking their options. 
+# SAVING DATA
 #~~~~~
-
-def high_low(records, column, choice):
-
-    highest = float('-inf')
-    lowest = float('inf')
-
-    high_matches = []
-    low_matches = []
-
-    # find highest and lowest first
-    for i, record in enumerate(records, start=1):
-
-        value = float(record[column]) if column == 5 else int(record[column])
-
-        if value > highest:
-            highest = value
-
-        if value < lowest:
-            lowest = value
-
-    # collect ALL matches after we know values
-    for i, record in enumerate(records, start=1):
-
-        value = float(record[column]) if column == 5 else int(record[column])
-
-        if value == highest:
-            high_matches.append((i, record))
-
-        if value == lowest:
-            low_matches.append((i, record))
-
-    # OUTPUT
-    if choice == 1 or choice == 3:
-        print("\nHIGHEST VALUE:", highest)
-        for index, record in high_matches:
-            print(f"Index {index} | {record}")
-
-    if choice == 2 or choice == 3:
-        print("\nLOWEST VALUE:", lowest)
-        for index, record in low_matches:
-            print(f"Index {index} | {record}")
-
-
-#~~~~~
-# SAVE RESULTS this is where the output of the options they pick will be saved onto a seperate .txt file. 
-#~~~~~
-
-def save_results_to_file(results, filename="results.txt"):
+def save_data_to_file(data_list, filename):
+    # Open the file in 'w' mode (write mode)
+    # This will overwrite the file or create a new one if it doesn't exist
     try:
-        with open(filename, "a") as file:
-
-            if results:
-                if isinstance(results[0], list):
-                    for r in results:
-                        file.write(f"{r[0]} | {r[1]} | {r[2]} | {r[3]} | {r[4]} | {r[5]} | {r[6]}\n")
-                else:
-                    file.write(f"{results[0]} | {results[1]} | {results[2]} | {results[3]} | {results[4]} | {results[5]} | {results[6]}\n")
-            else:
-                file.write("No results found\n")
-
-        print("\nResults saved to 'results.txt'")
-
-    except:
-        print("Error saving file")
-
-
-#~~~~~
-# MENU # this is where the user can chose what options they want to do and how the code works (they can control it) 
-#~~~~~
-def print_record(record):
-    print(
-        f"{record[0]} | {record[1]} | {record[2]} | "
-        f"{record[3]} | {record[4]} | {record[5]} | {record[6]}"
-    )
-def search_question():
-    search_choice = int(input(
-        "\nWhat Would you like to do? (1-5)\n"
-        "1) Linear search (unsorted)\n"
-        "2) Linear search (sorted)\n"
-        "3) Binary search\n"
-        "4) Performance test\n"
-        "5) High_Low\n"
-        "6) Exit\n\n< "
-    ))
-
-    while search_choice >= 1 or search_choice <= 6:
-        if search_choice == 1:
-            options = int(input("\nChoose a column\n(0) Vendor ID \n(1) Vendor Name \n(2) YYYYWW \n(3) Veg Hotdogs Sold \n(4) Meat Hotdogs sold \n(5) Onions \n(6) Ketchup Used\n\n< "))
-            linear_search(valid_records, options, 0)
-            search_question()
-
-        elif search_choice == 2:
-            options = int(input("\nChoose a column\n(0) Vendor ID \n(1) Vendor Name \n(2) YYYYWW \n(3) Veg Hotdogs Sold \n(4) Meat Hotdogs sold \n(5) Onions \n(6) Ketchup Used\n\n< "))
-            sorted_data = quick_sort(valid_records[:], options)
-            linear_search(sorted_data, options, 0)
-            search_question()
-
-        elif search_choice == 3:
-
-            col = int(input("\nChoose a column\n(0) Vendor ID \n(1) Vendor Name \n(2) YYYYWW \n(3) Veg Hotdogs Sold \n(4) Meat Hotdogs sold \n(5) Onions \n(6) Ketchup Used\n\n< "))
-
-            sorted_data = quick_sort(valid_records[:], col)
-            target = get_search_value(valid_records, col)
-            result = binary_search_all(sorted_data, target, col)
-
-            print("\nResult:\n")
-
-            if result:
-                if isinstance(result[0], list):
-                    for record in result:
-                        print(record)
-                else:
-                    print(result)
-            else:
-                print("No results found")
-            save_results_to_file(result)
-
-            if result:
-                if isinstance(result[0], list):
-                    for record in result:
-                        print(f"{record[0]} | {record[1]} | {record[2]} | {record[3]} | {record[4]} | {record[5]} | {record[6]}")
-
-                else:
-                    print(f"{result[0]} | {result[1]} | {result[2]} | {result[3]} | {result[4]} | {result[5]} | {result[6]}")
-
-            else:
-                print("No results found")
-            search_question()
-    
-        elif search_choice == 4:
-            performance_test(valid_records)
-            search_question()
-
-        elif search_choice == 5:
-            column = int(input("\nChoose a column\n\n(3) Veg Hotdogs Sold \n(4) Meat Hotdogs sold \n(5) Onions \n(6) Ketchup Used\n\n< "))
-            choice = int(input("1) Highest  2) Lowest  3) Both\n"))
-
-            high_low(valid_records, column, choice)
-            search_question()
+        file_out = open(filename, 'w')
+        
+        for row in data_list:
+            # We need to turn each list of data into a single string separated by commas
+            # We use str() on each item just in case some are numbers
+            line_to_save = str(row[0]) + "," + str(row[1]) + "," + str(row[2]) + "," + \
+                           str(row[3]) + "," + str(row[4]) + "," + str(row[5]) + "," + \
+                           str(row[6])
             
-        elif search_choice == 6:
-            print("Exiting program...")
-            break
+            # Write the string and add a newline character so the next row starts on a new line
+            file_out.write(line_to_save + "\n")
+            
+        file_out.close()
+        print("Success: Data has been saved to " + filename)
+        
+    except Exception as e:
+        print("An error occurred while saving: " + str(e))
+
+#~~~~~
+# MAIN APPLICATION LOOP #
+#~~~~~
+
+def run_app():
+    # Load and clean the data immediately when starting
+    records = load_data('Hotdogs.txt')
+    main_data = validation_check(records)
+    
+    keep_running = True
+    while keep_running == True:
+        print("\n" + "="*30)
+        print("   HOTDOG VENDOR SYSTEM")
+        print("="*30)
+        print("1. Unsorted Linear Search")
+        print("2. Sorted Linear Search")
+        print("3. Binary Search")
+        print("4. High/Low Analysis")
+        print("5. Performance Race")
+        print("6. Bubble Sort")
+        print("7. Quick Sort")
+        print("8. Exit")
+        
+        user_choice = input("\nSelect an option: ")
+        
+        if user_choice == "8":
+            print("\nExiting System... Have a nice day!")
+            keep_running = False
+            
+        elif user_choice in ["1", "2", "3", "4", "5", "6", "7"]:
+            print("\nAvailable Fields:")
+            print("0:ID, 1:Name, 2:Week, 3:Veg, 4:Meat, 5:Onions, 6:Ketchup")
+            
+            try:
+# Ask for the column using try and except for maximum robustness in my code 
+                c_input = input("Enter column index (0-6): ")
+                c = int(c_input)
+            except ValueError:
+                print("Invalid input. Please enter a number for the column.")
+                continue
+
+            if user_choice == "1":
+                t = input("Enter value to search for: ")
+                results = linear_search_unsorted(main_data, t, c)
+                print("\nSearch Results:")
+                for r in results: 
+                    print(r)
+
+            elif user_choice == "2":
+                t = input("Enter value to search for: ")
+# Use the faster sort before searching so that it takes less time for the search to actually happen 
+                sorted_list = quick_sort(main_data, c)
+                results = linear_search_sorted(sorted_list, t, c)
+                print("\nSearch Results:")
+                for r in results: 
+                    print(r)
+
+            elif user_choice == "3":
+                t = input("Enter value to search for: ")
+                sorted_list = quick_sort(main_data, c)
+                results = binary_search(sorted_list, t, c)
+                print("\nSearch Results:")
+                for r in results: 
+                    print(r)
+
+            elif user_choice == "4":
+# Sort first to find high and low easily
+                sorted_list = quick_sort(main_data, c)
+                lowest_record_val = sorted_list[0][c]
+                highest_record_val = sorted_list[-1][c]
+                
+# We will collect all matching records into a list to save them so that they can all be outputted at the sametime instead of just 1 
+                analysis_results = []
+
+                print(f"\n--- RECORDS WITH LOWEST VALUE ({lowest_record_val}) ---")
+                for row in sorted_list:
+                    if row[c] == lowest_record_val:
+                        print(row)
+                        analysis_results.append(row)
+# Add to our save list
+                    else:
+                        break
+                
+                print(f"\n--- RECORDS WITH HIGHEST VALUE ({highest_record_val}) ---")
+                for i in range(len(sorted_list)-1, -1, -1):
+                    if sorted_list[i][c] == highest_record_val:
+                        print(sorted_list[i])
+                        analysis_results.append(sorted_list[i])
+# Also add this to our save-list
+                    else:
+                        break
+
+                
+                save_confirm = input("\nWould you like to save these specific records to a file? (y/n): ")
+                if save_confirm.lower() == 'y':
+                    out_name = input("Enter filename for analysis (e.g., high_low_report.txt): ")
+# Reuse your existing save function to keep the code clean
+                    save_data_to_file(analysis_results, out_name)
+                
+
+            elif user_choice == "5":
+                t = input("Target value for the race: ")
+                sorted_list = quick_sort(main_data, c)
+                
+# Race 1: Unsorted Linear
+                start_time_1 = time.time()
+                linear_search_unsorted(main_data, t, c)
+                end_time_1 = time.time()
+                duration_1 = end_time_1 - start_time_1
+                
+# Race 2: Binary Search
+                start_time_2 = time.time()
+                binary_search(sorted_list, t, c)
+                end_time_2 = time.time()
+                duration_2 = end_time_2 - start_time_2
+                
+# Format to 8 decimal places as requested for a cleaner looking timer which is what i want 
+                print("Linear took: " + format(duration_1, '.8f') + " seconds")
+                print("Binary took: " + format(duration_2, '.8f') + " seconds")
+
+            elif user_choice == "6":
+# This changes the main_data order permanently which is important 
+                sorted_results = bubble_sort(main_data, c)
+                print("\nData Sorted by Bubble Sort:")
+                for r in sorted_results: 
+                    print(r)
+
+            elif user_choice == "7":
+                sorted_results = quick_sort(main_data, c)
+                print("\nData Sorted by Quick Sort:")
+                for r in sorted_results: 
+                    print(r)
         else:
-            print("Invalid option")
-            search_question()
+            print("Invalid menu choice. Please try again.")
+            
+# Call the app to start (basically the main part of the program)
+if __name__ == "__main__":
+    run_app()
 
-
-# RUN
-search_question()
