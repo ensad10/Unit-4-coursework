@@ -3,7 +3,6 @@ import time
 # Helper list to keep track of what each index means
 # 0:ID, 1:Name, 2:Week, 3:Veg, 4:Meat, 5:Onions, 6:Ketchup
 header_list = ["ID", "Name", "Week", "Veg", "Meat", "Onions", "Ketchup"]
-
 def load_data(filename):
     final_data = []
     try:
@@ -17,9 +16,7 @@ def load_data(filename):
         print("Could not find or read the file!")
         
     return final_data
-
-
-
+    
 def validation_check(records):
     clean_data = []
     for row in records:
@@ -220,7 +217,6 @@ def save_data_to_file(data_list, filename):
         
     except Exception as e:
         print("An error occurred while saving: " + str(e))
-
 
 # MAIN APPLICATION LOOP 
 
