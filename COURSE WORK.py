@@ -15,7 +15,9 @@ def load_data(filename):
                     final_data.append(items)
     except:
         print("Could not find or read the file!")
+        
     return final_data
+
 # Fixed validation section using 'row' consistently
 def validation_check(records):
     clean_data = []
@@ -23,33 +25,37 @@ def validation_check(records):
 # Check Vendor ID (Uppercase, 2 letters, underscore, 3 digits)
         if len(row[0]) != 6 or not row[0][:2].isupper() or not row[0][:2].isalpha() or row[0][2] != '_' or not row[0][3:].isdigit():
             continue
+            
 # Check Vendor name (between 2 and 25 characters)
         if len(row[1]) < 2 or len(row[1]) > 25:
             continue
+            
 # Check Year and Week (YYYYWW format, week between 1 and 52)
         if len(row[2]) != 6 or not row[2].isdigit() or int(row[2][4:]) < 1 or int(row[2][4:]) > 52:
-            continue            
+            continue
+            
 # Check if the veg dogs sold are divisible by 10
         if int(row[3]) % 10 != 0:
-            continue            
+            continue
+            
 # Check if the meat dogs sold are divisible by 10
         if int(row[4]) % 10 != 0:
-            continue            
+            continue
 # Check if the onions are in Increments of 0.5
         if (float(row[5]) * 2).is_integer() == False:
-            continue            
+            continue
+            
 # Check if the ketchup is an integer between 1 and 4
         if int(row[6]) < 1 or int(row[6]) > 4:
             continue
-            
+
         clean_data.append(row)
 
     print("~ After the validation check only", len(clean_data), "out of", len(records), "records have passed successfully ~")
     return clean_data
-    
-#~~~~~   
-# SEARCHING #
-#~~~~~
+
+
+# --- SEARCHING SECTION ---
 
 def linear_search_unsorted(data, target, col):
     results_found = []
@@ -57,7 +63,7 @@ def linear_search_unsorted(data, target, col):
     
     for item in data:
         current_value = item[col].lower()
-# Check every single row to find every match
+        # Check every single row to find every match
         if current_value == search_term:
             results_found.append(item)
             
@@ -92,6 +98,7 @@ def binary_search(data, target, col):
         if mid_val == search_term:
 # We found a match, now we must look around it for duplicates
             found_list.append(data[mid_index])
+            
 # Check the items to the left (backwards)
             left_pointer = mid_index - 1
             while left_pointer >= 0:
@@ -101,6 +108,7 @@ def binary_search(data, target, col):
                 else:
                     break
 # No more matches this way therefore we stop the code 
+            
 # Check the items to the right (forwards)
             right_pointer = mid_index + 1
             while right_pointer < len(data):
@@ -110,16 +118,17 @@ def binary_search(data, target, col):
                 else:
                     break
 # No more matches this way therefore we stop the code 
+            
             return found_list 
+            
         elif mid_val < search_term:
             low_index = mid_index + 1
         else:
             high_index = mid_index - 1
+            
     return found_list
-    
-#~~~~~
-# SORTING #
-#~~~~~
+
+# --- SORTING SECTION ---
 
 def bubble_sort(data, col):
 # Standard bubble sort using nested loops and a temp variable
@@ -134,11 +143,13 @@ def bubble_sort(data, col):
             else:
                 val1 = data[j][col].lower()
                 val2 = data[j+1][col].lower()
+            
             if val1 > val2:
 # Perform the actual swap
                 temporary_storage = data[j]
                 data[j] = data[j+1]
                 data[j+1] = temporary_storage
+                
     return data
 
 def quick_sort(data, col):
@@ -202,9 +213,8 @@ def save_data_to_file(data_list, filename):
     except Exception as e:
         print("An error occurred while saving: " + str(e))
 
-#~~~~~
-# MAIN APPLICATION LOOP #
-#~~~~~
+
+# MAIN APPLICATION LOOP 
 
 def run_app():
     # Load and clean the data immediately when starting
@@ -237,7 +247,7 @@ def run_app():
             
             try:
 # Ask for the column using try and except for maximum robustness in my code 
-                c_input = input("Enter column index (0-6): ")
+                c_input = input("Enter column index (0-6): ") 
                 c = int(c_input)
             except ValueError:
                 print("Invalid input. Please enter a number for the column.")
@@ -268,59 +278,92 @@ def run_app():
                     print(r)
 
             elif user_choice == "4":
-# Sort first to find high and low easily
+                # Sort first to find high and low easily
                 sorted_list = quick_sort(main_data, c)
                 lowest_record_val = sorted_list[0][c]
                 highest_record_val = sorted_list[-1][c]
                 
-# We will collect all matching records into a list to save them so that they can all be outputted at the sametime instead of just 1 
                 analysis_results = []
 
+                # --- PROCESS LOWEST ---
                 print(f"\n--- RECORDS WITH LOWEST VALUE ({lowest_record_val}) ---")
+                analysis_results.append(f"--- RECORDS WITH LOWEST VALUE ({lowest_record_val}) ---\n")
                 for row in sorted_list:
                     if row[c] == lowest_record_val:
                         print(row)
-                        analysis_results.append(row)
-# Add to our save list
-                    else:
-                        break
-                
-                print(f"\n--- RECORDS WITH HIGHEST VALUE ({highest_record_val}) ---")
-                for i in range(len(sorted_list)-1, -1, -1):
-                    if sorted_list[i][c] == highest_record_val:
-                        print(sorted_list[i])
-                        analysis_results.append(sorted_list[i])
-# Also add this to our save-list
+                        # Formatting the row as a string for the file
+                        analysis_results.append(", ".join(row) + "\n")
                     else:
                         break
 
-                
+                # --- PROCESS HIGHEST ---
+                print(f"\n--- RECORDS WITH HIGHEST VALUE ({highest_record_val}) ---")
+                analysis_results.append(f"\n--- RECORDS WITH HIGHEST VALUE ({highest_record_val}) ---\n")
+                # Loop backwards from the end
+                for i in range(len(sorted_list)-1, -1, -1):
+                    if sorted_list[i][c] == highest_record_val:
+                        print(sorted_list[i])
+                        analysis_results.append(", ".join(sorted_list[i]) + "\n")
+                    else:
+                        break
+
+                # --- SAVE SECTION ---
                 save_confirm = input("\nWould you like to save these specific records to a file? (y/n): ")
                 if save_confirm.lower() == 'y':
                     out_name = input("Enter filename for analysis (e.g., high_low_report.txt): ")
-# Reuse your existing save function to keep the code clean
-                    save_data_to_file(analysis_results, out_name)
+                    
+                    try:
+                        with open(out_name, "a") as f:
+                            f.write("\n" + "="*40 + "\n")
+                            f.write("~ HIGHEST AND LOWEST VALUE RESULTS ~\n")
+                            f.write(f"Generated on column: {header_list[c]}\n")
+                            f.write("="*40 + "\n")
+                            # Write each line stored in analysis_results
+                            f.writelines(analysis_results)
+                        print(f"Successfully saved analysis to {out_name}")
+                    except Exception as e:
+                        print(f"An error occurred while saving: {e}")
                 
 
             elif user_choice == "5":
                 t = input("Target value for the race: ")
-                sorted_list = quick_sort(main_data, c)
                 
 # Race 1: Unsorted Linear
                 start_time_1 = time.time()
                 linear_search_unsorted(main_data, t, c)
                 end_time_1 = time.time()
                 duration_1 = end_time_1 - start_time_1
+
+# Race 2: Sorted Linear
+                sorted_list = quick_sort(main_data, c)
+                start_time_sl = time.time()
+                linear_search_sorted(sorted_list, t, c)
+                end_time_sl = time.time()
+                duration_sl = end_time_sl - start_time_sl
                 
-# Race 2: Binary Search
+# Race 3: Binary Search
                 start_time_2 = time.time()
                 binary_search(sorted_list, t, c)
                 end_time_2 = time.time()
                 duration_2 = end_time_2 - start_time_2
+
+# Extra: Sort Comparison
+                start_bubble = time.time()
+                bubble_sort(list(main_data), c)
+                end_bubble = time.time()
+                duration_bubble = end_bubble - start_bubble
+
+                start_quick = time.time()
+                quick_sort(main_data, c)
+                end_quick = time.time()
+                duration_quick = end_quick - start_quick
                 
 # Format to 8 decimal places as requested for a cleaner looking timer which is what i want 
-                print("Linear took: " + format(duration_1, '.8f') + " seconds")
-                print("Binary took: " + format(duration_2, '.8f') + " seconds")
+                print("\n#~~~~~\nUnsorted Linear search took: " + format(duration_1, '.8f') + " seconds\n#~~~~~")
+                print("#~~~~~\nSorted Linear search took: " + format(duration_sl, '.8f') + " seconds\n#~~~~~")
+                print("#~~~~~\nBinary search took: " + format(duration_2, '.8f') + " seconds\n#~~~~~")
+                print("#~~~~~\nBubble Sort took: " + format(duration_bubble, '.8f') + " seconds\n#~~~~~")
+                print("#~~~~~\nQuick Sort took: " + format(duration_quick, '.8f') + " seconds\n#~~~~~")
 
             elif user_choice == "6":
 # This changes the main_data order permanently which is important 
@@ -336,8 +379,7 @@ def run_app():
                     print(r)
         else:
             print("Invalid menu choice. Please try again.")
-            
+                
 # Call the app to start (basically the main part of the program)
 if __name__ == "__main__":
     run_app()
-
