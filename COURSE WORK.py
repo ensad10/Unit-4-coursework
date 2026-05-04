@@ -18,42 +18,50 @@ def load_data(filename):
         
     return final_data
 
-# Fixed validation section using 'row' consistently
+
+
 def validation_check(records):
     clean_data = []
     for row in records:
 # Check Vendor ID (Uppercase, 2 letters, underscore, 3 digits)
         if len(row[0]) != 6 or not row[0][:2].isupper() or not row[0][:2].isalpha() or row[0][2] != '_' or not row[0][3:].isdigit():
             continue
-            
+
 # Check Vendor name (between 2 and 25 characters)
         if len(row[1]) < 2 or len(row[1]) > 25:
             continue
-            
+
 # Check Year and Week (YYYYWW format, week between 1 and 52)
-        if len(row[2]) != 6 or not row[2].isdigit() or int(row[2][4:]) < 1 or int(row[2][4:]) > 52:
+        if len(row[2]) != 6 or not row[2].isdigit():
             continue
-            
+        week_part = int(row[2][4:])
+        if week_part < 1 or week_part > 52:
+            continue
+
 # Check if the veg dogs sold are divisible by 10
         if int(row[3]) % 10 != 0:
             continue
-            
+
 # Check if the meat dogs sold are divisible by 10
         if int(row[4]) % 10 != 0:
             continue
+
 # Check if the onions are in Increments of 0.5
-        if (float(row[5]) * 2).is_integer() == False:
+        if float(row[5]) % 0.5 != 0:
             continue
-            
+
 # Check if the ketchup is an integer between 1 and 4
         if int(row[6]) < 1 or int(row[6]) > 4:
             continue
 
+# If it passed all 'continue' checks, add to clean_data
         clean_data.append(row)
 
     print("~ After the validation check only", len(clean_data), "out of", len(records), "records have passed successfully ~")
     return clean_data
 
+records = load_data('Hotdogs.txt') 
+main_data = validation_check(records)
 
 # --- SEARCHING SECTION ---
 
