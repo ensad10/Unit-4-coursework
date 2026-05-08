@@ -59,9 +59,6 @@ def validation_check(records):
     print("~ After the validation check only", len(clean_data), "out of", len(records), "records have passed successfully ~")
     return clean_data
 
-records = load_data('Hotdogs.txt') 
-main_data = validation_check(records)
-
 # --- SEARCHING SECTION ---
 
 def linear_search_unsorted(data, target, col):
