@@ -308,8 +308,7 @@ def run_app():
                     else:
                         break #Once finished end the code here 
                 
-                found_info = f"Min: {lowest_val} | Max: {highest_val}"
-                ask_to_save(analysis_results) #Call the universal save function
+                ask_to_save(analysis_results, c, header_list) #Call the universal save function
                 
             elif user_choice == "5":
                 t = input("Target value for the race: ")
